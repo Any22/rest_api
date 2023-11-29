@@ -2,31 +2,52 @@ package com.demo.rest_demo.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import com.demo.rest_demo.controller.CustomerController;
 import com.demo.rest_demo.dto.CustomerDTO;
 import com.demo.rest_demo.entity.Customer;
+import com.demo.rest_demo.exception.CustomerNotFoundException;
 import com.demo.rest_demo.repository.CustomerRepository;
+import com.demo.rest_demo.util.RestDemoConstant;
+
+import ch.qos.logback.classic.Logger;
 
 @Service
 public class CustomerService {
 	
 	@Autowired
     private ModelMapper modelMapper;  
+	
 	@Autowired
 	private CustomerRepository customerRepository;
 
+	
+	private static final Log LOGGER = LogFactory.getLog(CustomerService.class);
+    
+	/*************************************************************************************************************************
+	 * 
+	 * The method is getting list of Customer DTOs which was stored in the form of entities 
+	 * 
+	 * 
+	 * @return list of CustomerDTO which was stored in the form of entities
+	 * 
+	 *************************************************************************************************************************/
 	
 	public List<CustomerDTO> getAllCustomer() {
 		
 		// getting all entities from DB 
 	    List<Customer> customer = customerRepository.findAll();
 	   
-	    //creating a list to convert and store all entities into DTOs
+	    //creating a list of CustomerDTOs by converting entities into DTOs using "convertToDto" method
 	    
 	    List<CustomerDTO> customerDTOs = new ArrayList<>();
 	    
@@ -36,9 +57,29 @@ public class CustomerService {
 	    
 	}
 	
+    public CustomerDTO getCustomerById(Integer customerId) throws CustomerNotFoundException {
+		
+		// getting the customer from DB 
+    	
+	    Optional<Customer> customerOptional = customerRepository.findById(customerId);
+	   
+	    if (customerOptional.isPresent()) {
+	    	//very important line otherwise we will get null
+	    	Customer customer = customerOptional.get();
+	    	LOGGER.info("customer is present "+customer.getCustomerName());
+	    	 return modelMapper.map(customer, CustomerDTO.class);	
+	      
+	    }   else {
+	    	LOGGER.info("the customerId doesnot exist"+ customerId);
+	    	throw new CustomerNotFoundException("the customerId doesnot exist");
+	    
+	    }
+	}
 	/*************************************************************************************************************************
 	 * creating a customer 
-	 * Object Mapper converts DTO to Entity and back from Entity to DTO.
+	 * Model Mapper is a java library which can map one object to another object (entity to DTO and DTO to entity)
+	 * here CustomerEntity to CustomerDTO .
+	 * https://www.baeldung.com/java-modelmapper  (For unit testing )
 	 * 
 	 * @param email
 	 * 
@@ -55,7 +96,7 @@ public class CustomerService {
 	       customerEntity.setCustomerName(customerDTO.getCustomerName());
 	       customerEntity.setEmail(customerDTO.getEmail());
 	      
-	       customerRepository.save(customerEntity);
+	       customerRepository.saveAndFlush(customerEntity);
 	
 	       return customerEntity;
 	   
@@ -63,16 +104,71 @@ public class CustomerService {
 
 	 
 	 
-    // converting into DTO
+    /**************************************************************************************************************************************
+     * 
+     * @param customer
+     * @return
+     **************************************************************************************************************************************/
 	 
     public CustomerDTO convertToDto(Customer customer) {
-    
+    	
+    	// converting into DTO
         return modelMapper.map(customer, CustomerDTO.class);
     }
 
-
-	
-	
+    
+    /**************************************************************************************************************************************
+     * 
+     * @param customerId and customerDto
+     * @return
+     **************************************************************************************************************************************/
+    
+    
+    public CustomerDTO updateCustomer(Integer customerId,CustomerDTO customerDto) throws CustomerNotFoundException {
+    	Customer customer = null; 
+    	try {
+    	if (customerId == null) {
+    	        throw new IllegalArgumentException("Customer ID cannot be null");
+    	    }
+    	
+    	Optional<Customer> customerInRepo =  customerRepository.findById(customerId);
+    	
+    	if (customerInRepo.isPresent()) {
+    		customer = customerInRepo.get();
+    		customer.setEmail(customerDto.getEmail());
+    		customer.setCustomerName(customerDto.getCustomerName());
+    		customerRepository.saveAndFlush(customer);
+    	
+        } 	else {
+        	
+        	throw new CustomerNotFoundException("Customer does not exist");
+           }
+    	
+    	} catch(Exception e) {
+    		e.getStackTrace();
+    		LOGGER.error(e.getStackTrace().toString());
+    		throw e;
+    	}
+    	return  modelMapper.map(customer, CustomerDTO.class);
+    
+    }
+    	
+    
+    public void deleteCustomer(Integer customerId) {
+    	Customer customer = null;
+    	Optional<Customer> customerInRepo =  customerRepository.findById(customerId);
+    	
+    	if (customerInRepo.isPresent()) {
+    		customer = customerInRepo.get();
+    		customerRepository.deleteById(customer.getCustomerId());
+    
+    	}
+    		else {
+        	
+    			throw new CustomerNotFoundException("customer does not exist");
+           }
+        	
+    }
 }
 		
 	

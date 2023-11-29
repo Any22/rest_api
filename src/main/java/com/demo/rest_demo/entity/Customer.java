@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 /***************************************************************************************************
@@ -13,29 +14,14 @@ import jakarta.persistence.Table;
  * each instance variable represents to each column of table
  * persistence context
  * 
- * 
- * DROP TABLE IF EXISTS customers;
-CREATE TABLE customers(
-	customer_id INT PRIMARY KEY ,
-	customer_name VARCHAR(40) NOT NULL,
-    email_address VARCHAR(255)NOT NULL
-);
-DROP SEQUENCE IF EXISTS seq_customer_id;
-CREATE SEQUENCE seq_customer_id
-  INCREMENT 1
-  MINVALUE 1
-  MAXVALUE 9223372036854775807
-  START 100;
- SELECT * FROM customers;
  ***************************************************************************************************/
 
 @Entity
 @Table(name="customers")
 public class Customer {
-	
 	@Id
-    @GeneratedValue (strategy = GenerationType.SEQUENCE)
-	@Column(name = "customer_id", nullable = false)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_customer_id")
+	@SequenceGenerator(name = "seq_customer_id", sequenceName = "seq_customer_id", allocationSize = 1)
 	private Integer customerId;
 	
 	@Column(name = "customer_name", nullable = false)
