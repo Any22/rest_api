@@ -1,0 +1,18 @@
+DROP TABLE IF EXISTS customers;
+DROP SEQUENCE IF EXISTS seq_customer_id;
+CREATE SEQUENCE seq_customer_id
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 100;
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY DEFAULT nextval('seq_customer_id'),
+    customer_name VARCHAR(40) NOT NULL,
+    email_address VARCHAR(255) NOT NULL
+);
+
+
+  INSERT INTO customers (customer_name, email_address) VALUES
+    ('John Doe', 'john.doe@example.com'),
+    ('Jane Smith', 'jane.smith@example.com');
+	SELECT * FROM customers;
