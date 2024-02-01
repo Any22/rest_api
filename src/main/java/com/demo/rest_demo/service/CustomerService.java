@@ -9,17 +9,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+
 import org.springframework.stereotype.Service;
 
-import com.demo.rest_demo.controller.CustomerController;
+
 import com.demo.rest_demo.dto.CustomerDTO;
 import com.demo.rest_demo.entity.Customer;
 import com.demo.rest_demo.exception.CustomerNotFoundException;
 import com.demo.rest_demo.repository.CustomerRepository;
-import com.demo.rest_demo.util.RestDemoConstant;
 
-import ch.qos.logback.classic.Logger;
 
 @Service
 public class CustomerService {
@@ -49,7 +47,8 @@ public class CustomerService {
 	   
 	    //creating a list of CustomerDTOs by converting entities into DTOs using "convertToDto" method
 	    
-	    List<CustomerDTO> customerDTOs = new ArrayList<>();
+	    @SuppressWarnings("unused")
+		List<CustomerDTO> customerDTOs = new ArrayList<>();
 	    
 	    return customer.stream()
 	            .map(this::convertToDto)

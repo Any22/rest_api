@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
 		
 	}
 	
-	//Handler for validation failure w.r.t DTOs
+	//Handler for validation failure w.r.t DTOs or validation failures request body 
 	@ExceptionHandler (MethodArgumentNotValidException.class)
 	public ResponseEntity<ErrorMessage> methodArgumentExcpetionHandler (MethodArgumentNotValidException ex){
 		

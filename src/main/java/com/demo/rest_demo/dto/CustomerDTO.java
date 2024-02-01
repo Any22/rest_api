@@ -26,17 +26,17 @@ import jakarta.validation.constraints.NotNull;
  ******************************************************************************************************************************************/
 
 public class CustomerDTO {
-	@NotNull
+	@NotNull 
 	private Integer customerId;
-	@NotEmpty
+	@NotEmpty (message = "Customer name cannot be empty")
 	private String customerName;
 	@NotNull
-	@Email
+	@Email (message = "check the emial id format")
 	private String email;
 	
 	
 	public CustomerDTO() {
-	
+		this.customerId = 0; 
 	}
 
 

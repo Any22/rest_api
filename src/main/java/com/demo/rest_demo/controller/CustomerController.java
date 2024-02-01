@@ -1,5 +1,7 @@
 package com.demo.rest_demo.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -29,7 +31,7 @@ import com.demo.rest_demo.util.RestDemoConstant;
 import jakarta.validation.Valid;
 
 
-/**********************************************************************************************************
+/*****************************************************************************************************************************
  * Use Noun to represent the resources not verbs like /customer 
  * ResponseEntity class fine tune the Http responses (Response header + response body)
  * 
@@ -53,14 +55,25 @@ import jakarta.validation.Valid;
  *   Annotations used 
  *   @ResquestBody helps in de-serializing the incoming customer data into CustomerDTO
  *   @Validated annotations trigger the data validation on request parameters/URI parameters 
+ *   
+ *   @Inject(can be used in place of @Autowired) If you are developing a Java EE or Jakarta EE application, or if you want to
+ *    follow the JSR-330 standard for dependency injection, then @Inject is the more appropriate choice.
+ *   
+ *   getStackTrace() provides detailed information about the call stack, which can be useful for debugging and analyzing 
+ *   the flow of program execution when an exception occurs. On the other hand, getMessage() provides a human-readable 
+ *   description of the exception, conveying information about what went wrong in a more user-friendly way. Depending on 
+ *   the context, you might use one or both of these methods when dealing with exceptions.
 
- **********************************************************************************************************/
+ ***************************************************************************************************************************/
 @Validated 
 @RestController
+//urls which differs by host/domain, portnumber and schemes(http) are cross origin 
 @CrossOrigin
 public class CustomerController {
 	
-	private static final Log LOGGER = LogFactory.getLog(CustomerController.class);
+	private static final Log LOGGER=LogFactory.getLog(CustomerController.class) ;
+	
+	
 	
 	@Autowired
 	private CustomerService customerService;
@@ -76,12 +89,16 @@ public class CustomerController {
 	
 	@PostMapping(value = "/customers", consumes = {"application/json"})
     public ResponseEntity<String> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
-	
-		  if ( null == customerDTO) {
-			 
-			  return new ResponseEntity<String>("check data fields",HttpStatus.NO_CONTENT);
+		 
+		/******************************************************************************************************
+		 * The @Valid annotation will automatically trigger validation for customerDTO
+		 * No need to check for null here, as @Valid will handle validation .you don't need to manually throw 
+		 * MethodArgumentNotValidException in your controller method
+		 ******************************************************************************************************/
+		 if ( null == customerDTO) {
+			 	  return new ResponseEntity<String>("check data fields",HttpStatus.NO_CONTENT);
 		  }
-	    
+		 
         Customer createdCustomer = customerService.saveCustomer(customerDTO);   
         LOGGER.info(" Data for "+ createdCustomer.getCustomerName()+ " is saved !");
    
@@ -94,21 +111,33 @@ public class CustomerController {
 	 * @return A list of customerDTO
 	 * 
 	 *****************************************************************************************************************/
-	 @GetMapping(value = "/customers", produces= {"application/json"})
-	    public ResponseEntity<List<CustomerDTO>> getCustomer() {
+	 @GetMapping(produces= APPLICATION_JSON_VALUE, value = "/customers")
+	    public ResponseEntity<List<CustomerDTO>> getCustomer() throws CustomerNotFoundException {
 		 
-	        List<CustomerDTO> customerDto = customerService.getAllCustomer();
+	       try { 
+		 	List<CustomerDTO> customerDto = customerService.getAllCustomer();
 	        
-	        if (customerDto.isEmpty() || null == customerDto) {
-	        	
-	        	return ResponseEntity.notFound().build();
-	            
-	        } 
-	        	return new ResponseEntity<>(customerDto, HttpStatus.OK);
+		        if (customerDto.isEmpty() || null == customerDto) {
+		        	
+		        	throw new CustomerNotFoundException("No customers are found in database");
+		            
+		        } 
+	       	
+		        return new ResponseEntity<>(customerDto, HttpStatus.OK);
+	       } catch(CustomerNotFoundException CEx) {
+	    	   
+	    	   LOGGER.error(CEx.getStackTrace(),CEx);
+	    	   throw CEx;
+	    	  
+			   
+		   } catch (Exception ex) {
+			   LOGGER.error(ex.getStackTrace(),ex);
+	    	   throw ex;
+		   }
 	        
 	    }
 	 
-	 @GetMapping(value = "/customers/{customerId}", produces= {"application/json"})
+	 @GetMapping( produces= APPLICATION_JSON_VALUE, value = "/customers/{customerId}" )
 	    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Integer customerId) throws CustomerNotFoundException {
 		 
 		    LOGGER.info("CUSTOMER id "+ customerId);
@@ -125,7 +154,7 @@ public class CustomerController {
 	    }
 	 
 	 
-	 @PutMapping(value = "/customers/{customerId}", consumes = {"application/json"})
+	 @PutMapping(consumes = APPLICATION_JSON_VALUE,value = "/customers/{customerId}")
 	 
 	 public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable("customerId") Integer customerId, @RequestBody CustomerDTO customerDto)
 			 throws CustomerNotFoundException{
@@ -150,3 +179,6 @@ public class CustomerController {
 
 
 }
+
+
+
