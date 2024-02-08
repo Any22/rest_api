@@ -3,6 +3,9 @@ package com.demo.rest_demo.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 /********************************************************************************************************************************************
  * Java EE (up to version 8): If you are working with a Java EE version up to 8 or any framework that uses the Java EE validation API,
  *  you should use javax.validation.constraints.
@@ -24,58 +27,19 @@ import jakarta.validation.constraints.NotNull;
  * Data transfer object that carries data from one layer to another for e.g the form data reaches the controller layer using DTO objects 
  * 
  ******************************************************************************************************************************************/
-
+@Data 
+@NoArgsConstructor
+@AllArgsConstructor
 public class CustomerDTO {
+	
 	@NotNull 
 	private Integer customerId;
+	
 	@NotEmpty (message = "Customer name cannot be empty")
 	private String customerName;
+	
 	@NotNull
 	@Email (message = "check the emial id format")
 	private String email;
-	
-	
-	public CustomerDTO() {
-		this.customerId = 0; 
-	}
-
-
-	public CustomerDTO(Integer customerId, String customerName, String email) {
-		super();
-		this.customerId = customerId;
-		this.customerName = customerName;
-		this.email = email;
-	}
-
-
-	public Integer getCustomerId() {
-		return customerId;
-	}
-
-
-	public void setCustomerId(Integer customerId) {
-		this.customerId = customerId;
-	}
-
-
-	public String getCustomerName() {
-		return customerName;
-	}
-
-
-	public void setCustomerName(String customerName) {
-		this.customerName = customerName;
-	}
-
-
-	public String getEmail() {
-		return email;
-	}
-
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
 	
 }

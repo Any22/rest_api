@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.demo.rest_demo.util.RestDemoConstant;
 
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 /************************************************************************************************************************************
  * a real world application can handle the exceptions and validation failures 
@@ -48,7 +47,15 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
 		
 	}
-	
+	@ExceptionHandler (NoDataFoundException.class)
+	public ResponseEntity<ErrorMessage> noDataFoundExceptionHandler(NoDataFoundException ex){
+		
+		ErrorMessage error = new ErrorMessage();
+		error.setErrorCode(HttpStatus.BAD_REQUEST.value());
+		error.setMessage(ex.getMessage());
+		return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
+		
+	}
 	//Handler for validation failure w.r.t DTOs or validation failures request body 
 	@ExceptionHandler (MethodArgumentNotValidException.class)
 	public ResponseEntity<ErrorMessage> methodArgumentExcpetionHandler (MethodArgumentNotValidException ex){
@@ -67,9 +74,11 @@ public class GlobalExceptionHandler {
 		
 		ErrorMessage error = new ErrorMessage();
 		error.setErrorCode(HttpStatus.BAD_REQUEST.value());
-		error.setMessage(ex.getConstraintViolations().stream().map(ConstraintViolation::getMessage)
-				.collect(Collectors.joining(", ")));
+//		error.setMessage(ex.getConstraintViolations().stream().map(ConstraintViolation::getMessage)
+//				.collect(Collectors.joining(", ")));
+		error.setMessage("check the parameters and data object");
 		return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
+		
 			
 	}
 }

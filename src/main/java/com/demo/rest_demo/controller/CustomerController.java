@@ -14,20 +14,22 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-//import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.demo.rest_demo.dto.CustomerDTO;
 import com.demo.rest_demo.entity.Customer;
 import com.demo.rest_demo.exception.CustomerNotFoundException;
+import com.demo.rest_demo.exception.NoDataFoundException;
 import com.demo.rest_demo.service.CustomerService;
 import com.demo.rest_demo.util.RestDemoConstant;
 
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 
 
@@ -68,6 +70,7 @@ import jakarta.validation.Valid;
 @Validated 
 @RestController
 //urls which differs by host/domain, portnumber and schemes(http) are cross origin 
+@RequestMapping("/customers")
 @CrossOrigin
 public class CustomerController {
 	
@@ -87,7 +90,7 @@ public class CustomerController {
 	 * @return A string message 
 	 ***************************************************************************************************************/
 	
-	@PostMapping(value = "/customers", consumes = {"application/json"})
+	@PostMapping(value = "/create", consumes = {"application/json"})
     public ResponseEntity<String> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
 		 
 		/******************************************************************************************************
@@ -111,15 +114,15 @@ public class CustomerController {
 	 * @return A list of customerDTO
 	 * 
 	 *****************************************************************************************************************/
-	 @GetMapping(produces= APPLICATION_JSON_VALUE, value = "/customers")
-	    public ResponseEntity<List<CustomerDTO>> getCustomer() throws CustomerNotFoundException {
+	 @GetMapping(produces= APPLICATION_JSON_VALUE, value = "/get")
+	    public ResponseEntity<List<CustomerDTO>> getCustomer() throws NoDataFoundException {
 		 
 	       try { 
 		 	List<CustomerDTO> customerDto = customerService.getAllCustomer();
 	        
 		        if (customerDto.isEmpty() || null == customerDto) {
 		        	
-		        	throw new CustomerNotFoundException("No customers are found in database");
+		        	throw new NoDataFoundException("No customers are found in database");
 		            
 		        } 
 	       	
@@ -137,7 +140,7 @@ public class CustomerController {
 	        
 	    }
 	 
-	 @GetMapping( produces= APPLICATION_JSON_VALUE, value = "/customers/{customerId}" )
+	 @GetMapping( produces= APPLICATION_JSON_VALUE, value = "/get/{customerId}" )
 	    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Integer customerId) throws CustomerNotFoundException {
 		 
 		    LOGGER.info("CUSTOMER id "+ customerId);
@@ -154,16 +157,17 @@ public class CustomerController {
 	    }
 	 
 	 
-	 @PutMapping(consumes = APPLICATION_JSON_VALUE,value = "/customers/{customerId}")
+	 @PutMapping(consumes = APPLICATION_JSON_VALUE,value = "update/{customerId}")
 	 
 	 public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable("customerId") Integer customerId, @RequestBody CustomerDTO customerDto)
-			 throws CustomerNotFoundException{
+			 throws ConstraintViolationException{
 	
+		 
 		 return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomer(customerId,customerDto ));
 		 
 	 }
 	
-     @DeleteMapping (value= {"/customers/{customerId}"})
+     @DeleteMapping (value= {"/delete/{customerId}"})
      
      public ResponseEntity<String> deleteCustomer( @PathVariable Integer customerId) {
     	 

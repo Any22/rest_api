@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.NoArgsConstructor;
 
 /***************************************************************************************************
  * An entity class is the code representation of data table 
@@ -18,6 +19,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="customers")
+@NoArgsConstructor
 public class Customer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_customer_id")
@@ -30,11 +32,6 @@ public class Customer {
 	@Column(name = "email_address", nullable = false)
 	private String email;
 	
-  
-	public Customer() {
-		
-	}
-
 
 	public Customer(Integer customerId, String customerName, String email) {
 		super();

@@ -1,7 +1,9 @@
 package com.demo.rest_demo.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -168,7 +170,25 @@ public class CustomerService {
            }
         	
     }
-}
+
+	public CustomerDTO getCustomerWithIds( Integer customerId) {
+		Customer customer = null; 
+	
+			
+			 Optional<Customer> customerInRepo =  customerRepository.findById(customerId);
+			 if (customerInRepo.isPresent()) {
+		    		customer = customerInRepo.get();
+		    		LOGGER.info("customer is present "+customer.getCustomerName());
+			    	 return  modelMapper.map(customer, CustomerDTO.class);
+			 }
+			    	 else {
+			 	    	LOGGER.info("the customerId doesnot exist");
+			 	    	throw new CustomerNotFoundException("the customerId doesnot exist");
+			 	    
+			 	    }
+		  }
+		
+		}
 		
 	
 
