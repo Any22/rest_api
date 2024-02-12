@@ -1,6 +1,7 @@
 package com.demo.rest_demo.dto;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,13 +20,20 @@ import lombok.NoArgsConstructor;
 	@Email: Validates that a given string is a valid email address.
 	@Length: Validates that the length of the annotated element is between min and max (inclusive).
 	@Range: Checks whether the annotated value lies between (inclusive) the specified minimum and maximum.
+	
+	- Jakarta Bean Validation is a model for validating data in Java objects. 
+	- Hibernate Validator is the JBoss EAP implementation of Jakarta Bean Validation.
+	- JBoss EAP is 100% compliant with Jakarta Bean Validation 2.0 specification. Hibernate Validator also provides additional 
+	  features to the specification.
  *******************************************************************************************************************************************/
 
 
 
 /*******************************************************************************************************************************************
  * Data transfer object that carries data from one layer to another for e.g the form data reaches the controller layer using DTO objects 
- * 
+ * Hibernate validator is one of the implementations of the bean validation API.
+ * we use annotations to validate input/incoming data
+ * Bean validation API provides a number of annotations @Email, @Max ,@Min, @NotEmpty
  ******************************************************************************************************************************************/
 @Data 
 @NoArgsConstructor
@@ -35,11 +43,11 @@ public class CustomerDTO {
 	@NotNull 
 	private Integer customerId;
 	
-	@NotEmpty (message = "Customer name cannot be empty")
+	@NotNull (message="{customer.name.validation}")
 	private String customerName;
 	
 	@NotNull
-	@Email (message = "check the emial id format")
+	@Email (message ="{customer.email.validation}")
 	private String email;
 	
 }

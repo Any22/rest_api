@@ -10,6 +10,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.demo.rest_demo.util.RestDemoConstant;
 
@@ -20,6 +21,8 @@ import jakarta.validation.ConstraintViolationException;
  * Generalized handler 
  * Mentioning the type in @ExceptionHandler is mandatory when there are multiple types of exceptions to be handled by a single
  * single handler. 
+ * validations can be done in request body or uri parameters 
+ * we are handling validations in a centralized way and customized messages are generated 
  ***********************************************************************************************************************************/
 
 @RestControllerAdvice
@@ -28,13 +31,8 @@ public class GlobalExceptionHandler {
 	private Environment environment;
 	
 	@ExceptionHandler (Exception.class)
-	public ResponseEntity<ErrorMessage> generalExceptionHandler(Exception ex){
-		
-		ErrorMessage error = new ErrorMessage();
-		error.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-		error.setMessage(environment.getProperty(RestDemoConstant.GENERAL_EXCEPTION.toString()));
-		return new ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
-		
+	public String generalExceptionHandler(Exception ex){
+		return ex.getMessage();
 	}
 	
 	
@@ -81,4 +79,16 @@ public class GlobalExceptionHandler {
 		
 			
 	}
+	
+	@ExceptionHandler (NoResourceFoundException.class)
+	public ResponseEntity<ErrorMessage> noResourceFoundExceptionHandler ( NoResourceFoundException ex){
+		
+		ErrorMessage error = new ErrorMessage();
+		error.setErrorCode(HttpStatus.NOT_FOUND.value());
+        error.setMessage("no resourcse found.Please check uri is valid or not");
+		return new ResponseEntity<>(error,HttpStatus.NOT_FOUND);
+		
+			
+	}
+	
 }

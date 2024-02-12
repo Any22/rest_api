@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /***************************************************************************************************
@@ -20,6 +22,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name="customers")
 @NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class Customer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_customer_id")
@@ -31,45 +35,5 @@ public class Customer {
 		
 	@Column(name = "email_address", nullable = false)
 	private String email;
-	
-
-	public Customer(Integer customerId, String customerName, String email) {
-		super();
-		this.customerId = customerId;
-		this.customerName = customerName;
-		this.email = email;
-	}
-
-
-	public Integer getCustomerId() {
-		return customerId;
-	}
-
-
-	public void setCustomerId(Integer customerId) {
-		this.customerId = customerId;
-	}
-
-
-	public String getCustomerName() {
-		return customerName;
-	}
-
-
-	public void setCustomerName(String customerName) {
-		this.customerName = customerName;
-	}
-
-
-	public String getEmail() {
-		return email;
-	}
-
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
-	
-
+		
 }

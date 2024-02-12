@@ -2,10 +2,11 @@ package com.demo.rest_demo.util;
 
 public enum RestDemoConstant {
 	
-	CUSTOMER_NOT_FOUND("customer with this id not found"),
+	CUSTOMER_NOT_FOUND("customer.not.found"),
 	INTERNAL_SERVER_ERROR("internal.server.error"), 
 	GENERAL_EXCEPTION("general.excpetion"),
-	URI_BAD_REQUEST("bad.request");
+	URI_BAD_REQUEST("bad.request"),
+	NO_RESOURCE_FOUND("no.resource.found");
     private final String type;
     
     private RestDemoConstant(String type) {

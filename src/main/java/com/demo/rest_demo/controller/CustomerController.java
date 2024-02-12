@@ -3,6 +3,7 @@ package com.demo.rest_demo.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.demo.rest_demo.dto.CustomerDTO;
 import com.demo.rest_demo.entity.Customer;
 import com.demo.rest_demo.exception.CustomerNotFoundException;
+import com.demo.rest_demo.exception.MethodArgumentNotValidException;
 import com.demo.rest_demo.exception.NoDataFoundException;
 import com.demo.rest_demo.service.CustomerService;
 import com.demo.rest_demo.util.RestDemoConstant;
@@ -65,9 +70,13 @@ import jakarta.validation.Valid;
  *   the flow of program execution when an exception occurs. On the other hand, getMessage() provides a human-readable 
  *   description of the exception, conveying information about what went wrong in a more user-friendly way. Depending on 
  *   the context, you might use one or both of these methods when dealing with exceptions.
+ *   
+ *   Versioning is implemented in the handler method below using three ways 
+ *  
+ *   
 
  ***************************************************************************************************************************/
-@Validated 
+@Validated    //trigger for URI parameters validation
 @RestController
 //urls which differs by host/domain, portnumber and schemes(http) are cross origin 
 @RequestMapping("/customers")
@@ -88,25 +97,32 @@ public class CustomerController {
 	 * Creating a new data object and returning an acknowledgment string message that customer DTO has been created 
 	 * @param customerDTO
 	 * @return A string message 
+	 * @throws MethodArgumentNotValidException 
 	 ***************************************************************************************************************/
 	
 	@PostMapping(value = "/create", consumes = {"application/json"})
-    public ResponseEntity<String> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<String> createCustomer(@Valid @RequestBody CustomerDTO customerDTO ,Errors errors) throws MethodArgumentNotValidException {
 		 
 		/******************************************************************************************************
 		 * The @Valid annotation will automatically trigger validation for customerDTO
 		 * No need to check for null here, as @Valid will handle validation .you don't need to manually throw 
 		 * MethodArgumentNotValidException in your controller method
 		 ******************************************************************************************************/
-		 if ( null == customerDTO) {
-			 	  return new ResponseEntity<String>("check data fields",HttpStatus.NO_CONTENT);
+		String resposne ="";
+		if (errors.hasErrors()) {
+			
+			resposne= errors.getAllErrors().stream().map(ObjectError::getDefaultMessage)
+					.collect(Collectors.joining(","));
+			throw new MethodArgumentNotValidException(errors);
+			
+		  } else {
+			  
+			  	customerService.saveCustomer(customerDTO);   
+		        LOGGER.info(" Data for "+ customerDTO.getCustomerName()+ " is saved !");
+		        return new ResponseEntity<>("Data created for : "+ customerDTO.getCustomerName(), HttpStatus.CREATED);
 		  }
 		 
-        Customer createdCustomer = customerService.saveCustomer(customerDTO);   
-        LOGGER.info(" Data for "+ createdCustomer.getCustomerName()+ " is saved !");
-   
-       
-        return new ResponseEntity<>("Data created for : "+ customerDTO.getCustomerName(), HttpStatus.CREATED);
+     
     }
 	
 	/*****************************************************************************************************************
@@ -114,7 +130,7 @@ public class CustomerController {
 	 * @return A list of customerDTO
 	 * 
 	 *****************************************************************************************************************/
-	 @GetMapping(produces= APPLICATION_JSON_VALUE, value = "/get")
+	 @GetMapping(produces= APPLICATION_JSON_VALUE, value = "v1/get")
 	    public ResponseEntity<List<CustomerDTO>> getCustomer() throws NoDataFoundException {
 		 
 	       try { 
@@ -127,20 +143,47 @@ public class CustomerController {
 		        } 
 	       	
 		        return new ResponseEntity<>(customerDto, HttpStatus.OK);
-	       } catch(CustomerNotFoundException CEx) {
-	    	   
-	    	   LOGGER.error(CEx.getStackTrace(),CEx);
-	    	   throw CEx;
-	    	  
-			   
-		   } catch (Exception ex) {
+	       } catch (Exception ex) {
 			   LOGGER.error(ex.getStackTrace(),ex);
 	    	   throw ex;
 		   }
 	        
 	    }
 	 
-	 @GetMapping( produces= APPLICATION_JSON_VALUE, value = "/get/{customerId}" )
+	 @GetMapping(produces= APPLICATION_JSON_VALUE, value = "v2/get")
+	    public String getCustomerv2() throws NoDataFoundException {
+			
+		 /**************************************************************************************
+		  * Logic can be implemented here that can fetch another information related to customer
+		  * the idea behind this controller is to implement URI versioning
+		  *************************************************************************************/
+		 
+		 
+		 return "version2 URI (Demo)"; 
+	        
+	    }
+	 
+	  @GetMapping(value = "v3/get" , headers="X-API-VERSION=1")
+	    public String getCustomerv3() throws NoDataFoundException {
+			
+		 /**************************************************************************************
+		  * Logic can be implemented here that can fetch another information related to customer
+		  * the idea behind this controller is to implement versioning with custom header
+		  *************************************************************************************/
+		 
+		 
+		 return "version3 customer headers(Demo)"; 
+	        
+	    }
+	 
+	  /*****************************************************************************************
+	   * @param customerId
+	   * @return
+	   * @throws CustomerNotFoundException
+	   * URI : http://localhost:8083/customerMS/customers/v1/get/102
+	   ****************************************************************************************/
+	  
+	 @GetMapping( produces= APPLICATION_JSON_VALUE, value = "v1/get/{customerId}" )
 	    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Integer customerId) throws CustomerNotFoundException {
 		 
 		    LOGGER.info("CUSTOMER id "+ customerId);
@@ -156,11 +199,26 @@ public class CustomerController {
 	        
 	    }
 	 
+	/*********************************************************************************************
+	 * @param customerId
+	 * @return
+	 * @throws CustomerNotFoundException
+	 *  URI : http://localhost:8083/customerMS/customers/get/107?version=2
+	 *********************************************************************************************/
+	 
+	 @GetMapping( produces= APPLICATION_JSON_VALUE, value = "/get/{customerId}" ,params="version=2" )
+	    public String getCustomerByIdV1(@PathVariable Integer customerId) throws CustomerNotFoundException {
+		 
+		    
+	        	return "to demonstrate the request parameter versioning";
+	        
+	    }
+	 
 	 
 	 @PutMapping(consumes = APPLICATION_JSON_VALUE,value = "update/{customerId}")
 	 
 	 public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable("customerId") Integer customerId, @RequestBody CustomerDTO customerDto)
-			 throws ConstraintViolationException{
+			 throws ConstraintViolationException, CustomerNotFoundException{
 	
 		 
 		 return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomer(customerId,customerDto ));
@@ -169,7 +227,7 @@ public class CustomerController {
 	
      @DeleteMapping (value= {"/delete/{customerId}"})
      
-     public ResponseEntity<String> deleteCustomer( @PathVariable Integer customerId) {
+     public ResponseEntity<String> deleteCustomer( @PathVariable Integer customerId) throws CustomerNotFoundException {
     	 
     	  if (null == customerId || customerId.equals(0)) {
  			 

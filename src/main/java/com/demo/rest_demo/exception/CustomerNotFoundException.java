@@ -1,8 +1,12 @@
 package com.demo.rest_demo.exception;
 
-public class CustomerNotFoundException extends RuntimeException  {
+public class CustomerNotFoundException extends Exception  {
 	
 	private static final long serialVersionUID = 1L;
+	
+	public CustomerNotFoundException() {		
+		super();		
+	}
 	public CustomerNotFoundException( String message) {		
 		super(message);		
 	}

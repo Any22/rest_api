@@ -90,7 +90,7 @@ public class CustomerService {
 	 * 
 	 **************************************************************************************************************************/
 	
-	 public Customer saveCustomer(CustomerDTO customerDTO) {
+	 public CustomerDTO saveCustomer(CustomerDTO customerDTO) {
                    
 	       Customer customerEntity = new Customer();
 	    
@@ -98,9 +98,9 @@ public class CustomerService {
 	       customerEntity.setEmail(customerDTO.getEmail());
 	      
 	       customerRepository.saveAndFlush(customerEntity);
+	       CustomerDTO customerDto = this.convertToDto(customerEntity);
 	
-	       return customerEntity;
-	   
+	       return customerDto;   
 	    }
 
 	 
@@ -155,7 +155,7 @@ public class CustomerService {
     }
     	
     
-    public void deleteCustomer(Integer customerId) {
+    public void deleteCustomer(Integer customerId) throws CustomerNotFoundException {
     	Customer customer = null;
     	Optional<Customer> customerInRepo =  customerRepository.findById(customerId);
     	
@@ -171,7 +171,7 @@ public class CustomerService {
         	
     }
 
-	public CustomerDTO getCustomerWithIds( Integer customerId) {
+	public CustomerDTO getCustomerWithIds( Integer customerId) throws CustomerNotFoundException {
 		Customer customer = null; 
 	
 			
