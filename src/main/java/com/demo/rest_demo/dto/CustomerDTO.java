@@ -46,7 +46,7 @@ public class CustomerDTO {
 	@NotNull (message="{customer.name.validation}")
 	private String customerName;
 	
-	@NotNull
+	
 	@Email (message ="{customer.email.validation}")
 	private String email;
 	

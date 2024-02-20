@@ -1,7 +1,7 @@
 package com.demo.rest_demo.util;
 
-public enum RestDemoConstant {
-	
+public enum RestDemoConstant {	
+			
 	CUSTOMER_NOT_FOUND("customer.not.found"),
 	INTERNAL_SERVER_ERROR("internal.server.error"), 
 	GENERAL_EXCEPTION("general.excpetion"),

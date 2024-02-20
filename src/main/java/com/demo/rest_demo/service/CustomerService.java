@@ -11,7 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -29,6 +29,12 @@ public class CustomerService {
 	
 	@Autowired
 	private CustomerRepository customerRepository;
+	
+	@Value("${customer.not.found}")
+	private String idNotFound;
+	
+	@Value("${customer.id.null}")
+	private String idNotNull;
 
 	
 	private static final Log LOGGER = LogFactory.getLog(CustomerService.class);
@@ -72,7 +78,7 @@ public class CustomerService {
 	      
 	    }   else {
 	    	LOGGER.info("the customerId doesnot exist"+ customerId);
-	    	throw new CustomerNotFoundException("the customerId doesnot exist");
+	    	throw new CustomerNotFoundException(idNotFound);
 	    
 	    }
 	}
@@ -129,7 +135,7 @@ public class CustomerService {
     	Customer customer = null; 
     	try {
     	if (customerId == null) {
-    	        throw new IllegalArgumentException("Customer ID cannot be null");
+    	        throw new IllegalArgumentException(idNotNull);
     	    }
     	
     	Optional<Customer> customerInRepo =  customerRepository.findById(customerId);
@@ -142,7 +148,7 @@ public class CustomerService {
     	
         } 	else {
         	
-        	throw new CustomerNotFoundException("Customer does not exist");
+        	throw new CustomerNotFoundException(idNotFound);
            }
     	
     	} catch(Exception e) {
@@ -166,7 +172,7 @@ public class CustomerService {
     	}
     		else {
         	
-    			throw new CustomerNotFoundException("customer does not exist");
+    			throw new CustomerNotFoundException(idNotFound);
            }
         	
     }
@@ -183,7 +189,7 @@ public class CustomerService {
 			 }
 			    	 else {
 			 	    	LOGGER.info("the customerId doesnot exist");
-			 	    	throw new CustomerNotFoundException("the customerId doesnot exist");
+			 	    	throw new CustomerNotFoundException(idNotFound);
 			 	    
 			 	    }
 		  }
