@@ -40,18 +40,18 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorMessage> customerNotFoundExceptionHandler(CustomerNotFoundException ex){
 		
 		ErrorMessage error = new ErrorMessage();
-		error.setErrorCode(HttpStatus.BAD_REQUEST.value());
+		error.setErrorCode(HttpStatus.NOT_FOUND.value());
 		error.setMessage(ex.getMessage());
-		return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(error,HttpStatus.NOT_FOUND);
 		
 	}
 	@ExceptionHandler (NoDataFoundException.class)
 	public ResponseEntity<ErrorMessage> noDataFoundExceptionHandler(NoDataFoundException ex){
 		
 		ErrorMessage error = new ErrorMessage();
-		error.setErrorCode(HttpStatus.BAD_REQUEST.value());
+		error.setErrorCode(HttpStatus.NOT_FOUND.value());
 		error.setMessage(ex.getMessage());
-		return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(error,HttpStatus.NOT_FOUND);
 		
 	}
 	//Handler for validation failure w.r.t DTOs or validation failures request body 
@@ -60,8 +60,10 @@ public class GlobalExceptionHandler {
 		
 		ErrorMessage error = new ErrorMessage();
 		error.setErrorCode(HttpStatus.BAD_REQUEST.value());
+		
 		error.setMessage(ex.getBindingResult().getAllErrors().stream().map(ObjectError::getDefaultMessage)
 				.collect(Collectors.joining(", ")));
+		
 		return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
 			
 	}
@@ -72,8 +74,6 @@ public class GlobalExceptionHandler {
 		
 		ErrorMessage error = new ErrorMessage();
 		error.setErrorCode(HttpStatus.BAD_REQUEST.value());
-//		error.setMessage(ex.getConstraintViolations().stream().map(ConstraintViolation::getMessage)
-//				.collect(Collectors.joining(", ")));
 		error.setMessage("check the parameters and data object");
 		return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
 		

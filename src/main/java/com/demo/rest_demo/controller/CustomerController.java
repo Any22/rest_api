@@ -108,10 +108,10 @@ public class CustomerController {
 		 * No need to check for null here, as @Valid will handle validation .you don't need to manually throw 
 		 * MethodArgumentNotValidException in your controller method
 		 ******************************************************************************************************/
-		String resposne ="";
+		String response = "";
 		if (errors.hasErrors()) {
 			
-			resposne= errors.getAllErrors().stream().map(ObjectError::getDefaultMessage)
+			response= errors.getAllErrors().stream().map(ObjectError::getDefaultMessage)
 					.collect(Collectors.joining(","));
 			throw new MethodArgumentNotValidException(errors);
 			
@@ -128,7 +128,7 @@ public class CustomerController {
 	/*****************************************************************************************************************
 	 * Fetching the list of customers from the database.
 	 * @return A list of customerDTO
-	 * 
+	 * http://localhost:8083/customerMS/customers/v1/get
 	 *****************************************************************************************************************/
 	 @GetMapping(produces= APPLICATION_JSON_VALUE, value = "v1/get")
 	    public ResponseEntity<List<CustomerDTO>> getCustomer() throws NoDataFoundException {
@@ -183,10 +183,11 @@ public class CustomerController {
 	   * URI : http://localhost:8083/customerMS/customers/v1/get/102
 	   ****************************************************************************************/
 	  
-	 @GetMapping( produces= APPLICATION_JSON_VALUE, value = "v1/get/{customerId}" )
-	    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Integer customerId) throws CustomerNotFoundException {
+@GetMapping( produces= APPLICATION_JSON_VALUE, value = "v1/get/{customerId}" )
+	    public ResponseEntity<CustomerDTO> getCustomerById(@Valid @PathVariable Integer customerId) throws CustomerNotFoundException {
 		 
 		    LOGGER.info("CUSTOMER id "+ customerId);
+	try {
 	        CustomerDTO customerDto = customerService.getCustomerById(customerId);
 	      
 	        
@@ -197,7 +198,10 @@ public class CustomerController {
 	        } 
 	        	return new ResponseEntity<>(customerDto, HttpStatus.OK);
 	        
-	    }
+	    } catch(Exception ee) {
+	    	throw ee;
+	      }
+}
 	 
 	/*********************************************************************************************
 	 * @param customerId
