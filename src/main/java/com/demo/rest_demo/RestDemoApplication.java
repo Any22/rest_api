@@ -20,15 +20,15 @@ import org.springframework.web.util.UrlPathHelper;
 @ComponentScan(basePackages = "com.demo.rest_demo")
 public class RestDemoApplication implements WebMvcConfigurer {
 
-	public static void main(String[] args) {
-		SpringApplication.run(RestDemoApplication.class, args);
-	}
-	
-	 @Override
-	    public void configurePathMatch(PathMatchConfigurer configurer) {
-	           UrlPathHelper urlPathHelper = new UrlPathHelper();
-	           urlPathHelper.setRemoveSemicolonContent(false);
-	        configurer.setUrlPathHelper(urlPathHelper );
-	    }
+    public static void main(String[] args) {
+        SpringApplication.run(RestDemoApplication.class, args);
+    }
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        UrlPathHelper urlPathHelper = new UrlPathHelper();
+        urlPathHelper.setRemoveSemicolonContent(false);
+        configurer.setUrlPathHelper(urlPathHelper);
+    }
 
 }

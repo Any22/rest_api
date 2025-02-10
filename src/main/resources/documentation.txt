@@ -1,0 +1,39 @@
+Use Noun to represent the resources not verbs like /customer
+ * ResponseEntity class fine tune the Http responses (Response header + response body)
+ *
+ * using ResponseEntity class we can set the body, status and header of a Http response .
+ * Status can be : ok()         ---> 200 code    (Static methods)
+ *                 ok(T Body)   ---> 201
+ *                 badRequest() ---> 400
+ *                 notFound()   ---> 404
+ *                 status(int status) ---> Sets the given status code value
+ *                 status(HTTPStatus status) -----> Sets the status code using HttpStaus enum
+ *
+ *   Response Entity (Constructors)
+ *  1. ResponseEntity(Http status) creates a response entity object with the given status code
+ *   and no body
+ *  2. ResponseEntity(MultiValueMap headers, HttpStatus status)  creates a ResponseEntity object
+ *   with headers and status code  but NO BODY
+ *  3. ResponseEntity(T body, HttpStatus status)  ResponseEntity object with status code and body
+ *  4. ResponseEntity(T body , MultiValueMap headers, HttpStatus status)  ResponseEntity object with status
+ *  code , body and headers
+ *
+ *   Annotations used
+ *   @ResquestBody helps in de-serializing the incoming customer data into CustomerDTO
+ *   @Validated annotations trigger the data validation on request parameters/URI parameters
+ *
+ *   @Inject(can be used in place of @Autowired) If you are developing a Java EE or Jakarta EE application, or if you want to
+ *    follow the JSR-330 standard for dependency injection, then @Inject is the more appropriate choice.
+ *
+ *   getStackTrace() provides detailed information about the call stack, which can be useful for debugging and analyzing
+ *   the flow of program execution when an exception occurs. On the other hand, getMessage() provides a human-readable
+ *   description of the exception, conveying information about what went wrong in a more user-friendly way. Depending on
+ *   the context, you might use one or both of these methods when dealing with exceptions.
+ *
+ *   Versioning is implemented in the handler method below using three ways
+ *
+ *   Model Mapper is a java library which can map one object to another object (entity to DTO and DTO to entity)
+ *   Here CustomerEntity to CustomerDTO .
+  	 * https://www.baeldung.com/java-modelmapper  (For unit testing )
+ *  DDL to create the table and DML to populate the data
+ *  The interface extends JPA Repository and pass Entity class and type of primary key

@@ -1,15 +1,12 @@
 package com.demo.rest_demo.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,10 +20,7 @@ import com.demo.rest_demo.repository.CustomerRepository;
 
 @Service
 public class CustomerService {
-	
-	@Autowired
-    private ModelMapper modelMapper;  
-	
+
 	@Autowired
 	private CustomerRepository customerRepository;
 	
@@ -36,32 +30,27 @@ public class CustomerService {
 	@Value("${customer.id.null}")
 	private String idNotNull;
 
-	
+
 	private static final Log LOGGER = LogFactory.getLog(CustomerService.class);
-    
+
 	/*************************************************************************************************************************
-	 * 
-	 * The method is getting list of Customer DTOs which was stored in the form of entities 
-	 * 
-	 * 
+	 * The method is getting list of Customer DTOs which was stored in the form of entities
 	 * @return list of CustomerDTO which was stored in the form of entities
-	 * 
 	 *************************************************************************************************************************/
-	
+
 	public List<CustomerDTO> getAllCustomer() {
-		
+
 		// getting all entities from DB 
-	    List<Customer> customer = customerRepository.findAll();
-	   
-	    //creating a list of CustomerDTOs by converting entities into DTOs using "convertToDto" method
-	    
-	    @SuppressWarnings("unused")
-		List<CustomerDTO> customerDTOs = new ArrayList<>();
-	    
-	    return customer.stream()
-	            .map(this::convertToDto)
-	            .collect(Collectors.toList());
-	    
+		List<Customer> customer = customerRepository.findAll();
+
+		//creating a list of CustomerDTOs by converting entities into DTOs using "convertToDto" method
+
+		//List<CustomerDTO> customerDTOs = new ArrayList<>();
+
+		return customer.stream()
+				.map(this::convertToDto)
+				.collect(Collectors.toList());
+
 	}
 	
     public CustomerDTO getCustomerById(Integer customerId) throws CustomerNotFoundException {
@@ -74,7 +63,7 @@ public class CustomerService {
 	    	//very important line otherwise we will get null
 	    	Customer customer = customerOptional.get();
 	    	LOGGER.info("customer is present "+customer.getCustomerName());
-	    	 return modelMapper.map(customer, CustomerDTO.class);	
+	    	 return convertToDto(customer);
 	      
 	    }   else {
 	    	LOGGER.info("the customerId doesnot exist"+ customerId);
@@ -82,52 +71,26 @@ public class CustomerService {
 	    
 	    }
 	}
+
 	/*************************************************************************************************************************
-	 * creating a customer 
-	 * Model Mapper is a java library which can map one object to another object (entity to DTO and DTO to entity)
-	 * here CustomerEntity to CustomerDTO .
-	 * https://www.baeldung.com/java-modelmapper  (For unit testing )
-	 * 
-	 * @param email
-	 * 
-	 * @param name
-	 * 
-	 * @return a message of successful creation
-	 * 
+	 * A helper method for Converting a customer DTO into customer entity to save into the repository
 	 **************************************************************************************************************************/
-	
-	 public CustomerDTO saveCustomer(CustomerDTO customerDTO) {
-                   
-	       Customer customerEntity = new Customer();
-	    
-	       customerEntity.setCustomerName(customerDTO.getCustomerName());
-	       customerEntity.setEmail(customerDTO.getEmail());
-	      
-	       customerRepository.saveAndFlush(customerEntity);
-	       CustomerDTO customerDto = this.convertToDto(customerEntity);
-	
-	       return customerDto;   
-	    }
 
-	 
-	 
-    /**************************************************************************************************************************************
-     * 
-     * @param customer
-     * @return
-     **************************************************************************************************************************************/
-	 
-    public CustomerDTO convertToDto(Customer customer) {
-    	
-    	// converting into DTO
-        return modelMapper.map(customer, CustomerDTO.class);
-    }
+	public void saveCustomer(CustomerDTO customerDTO) {
 
-    
+		Customer customerEntity = new Customer();
+
+		customerEntity.setCustomerName(customerDTO.getCustomerName());
+		customerEntity.setEmail(customerDTO.getEmail());
+
+		customerRepository.saveAndFlush(customerEntity);
+
+	}
+
     /**************************************************************************************************************************************
      * 
      * @param customerId and customerDto
-     * @return
+     * @return CustomerDTO
      **************************************************************************************************************************************/
     
     
@@ -156,11 +119,10 @@ public class CustomerService {
     		LOGGER.error(e.getStackTrace().toString());
     		throw e;
     	}
-    	return  modelMapper.map(customer, CustomerDTO.class);
+    	return  this.convertToDto(customer);
     
     }
-    	
-    
+
     public void deleteCustomer(Integer customerId) throws CustomerNotFoundException {
     	Customer customer = null;
     	Optional<Customer> customerInRepo =  customerRepository.findById(customerId);
@@ -179,13 +141,12 @@ public class CustomerService {
 
 	public CustomerDTO getCustomerWithIds( Integer customerId) throws CustomerNotFoundException {
 		Customer customer = null; 
-	
-			
+
 			 Optional<Customer> customerInRepo =  customerRepository.findById(customerId);
 			 if (customerInRepo.isPresent()) {
 		    		customer = customerInRepo.get();
 		    		LOGGER.info("customer is present "+customer.getCustomerName());
-			    	 return  modelMapper.map(customer, CustomerDTO.class);
+			    	 return  this.convertToDto(customer);
 			 }
 			    	 else {
 			 	    	LOGGER.info("the customerId doesnot exist");
@@ -193,6 +154,35 @@ public class CustomerService {
 			 	    
 			 	    }
 		  }
+
+	/**************************************************************************************************************************************
+	 * @param customer (Entity)
+	 * @return  CustomerDTO
+	 **************************************************************************************************************************************/
+
+	public CustomerDTO convertToDto(Customer customer) {
+
+		// converting into DTO
+		return CustomerDTO.builder()
+				.customerId(customer.getCustomerId())
+				.customerName(customer.getCustomerName())
+				.email(customer.getEmail())
+				.build();
+	}
+
+	/**************************************************************************************************************************************
+	 * @param customerDTO (Entity)
+	 * @return  CustomerDTO
+	 **************************************************************************************************************************************/
+
+	public Customer convertToEntity (CustomerDTO customerDTO) {
+
+		// converting into Entity
+		return Customer.builder()
+				.customerName(customerDTO.getCustomerName())
+				.email(customerDTO.getEmail())
+				.build();
+	}
 		
 }
 		

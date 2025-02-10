@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 /********************************************************************************************************************************************
@@ -36,7 +37,8 @@ import lombok.NoArgsConstructor;
  * we use annotations to validate input/incoming data
  * Bean validation API provides a number of annotations @Email, @Max ,@Min, @NotEmpty
  ******************************************************************************************************************************************/
-@Data 
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerDTO {
