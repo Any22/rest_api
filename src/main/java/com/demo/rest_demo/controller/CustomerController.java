@@ -18,7 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.demo.rest_demo.dto.CustomerDTO;
-import com.demo.rest_demo.entity.Customer;
+
 import com.demo.rest_demo.exception.CustomerNotFoundException;
 import com.demo.rest_demo.exception.MethodArgumentNotValidException;
 import com.demo.rest_demo.exception.NoDataFoundException;
@@ -51,11 +51,6 @@ public class CustomerController {
     @PostMapping(value = "/create", consumes = {"application/json"})
     public ResponseEntity<String> createCustomer(@Valid @RequestBody CustomerDTO customerDTO, Errors errors) throws MethodArgumentNotValidException {
 
-        /*************************************************************************************************************
-         * The @Valid annotation will automatically trigger validation for customerDTO
-         * No need to check for null here, as @Valid will handle validation .you don't need to manually throw
-         * MethodArgumentNotValidException in your controller method
-         *************************************************************************************************************/
         String response = "";
         if (errors.hasErrors()) {
 

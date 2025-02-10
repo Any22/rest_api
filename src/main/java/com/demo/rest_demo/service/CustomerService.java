@@ -95,7 +95,7 @@ public class CustomerService {
     
     
     public CustomerDTO updateCustomer(Integer customerId,CustomerDTO customerDto) throws CustomerNotFoundException {
-    	Customer customer = null; 
+    	Customer customer ;
     	try {
     	if (customerId == null) {
     	        throw new IllegalArgumentException(idNotNull);
@@ -116,7 +116,7 @@ public class CustomerService {
     	
     	} catch(Exception e) {
     		e.getStackTrace();
-    		LOGGER.error(e.getStackTrace().toString());
+    		LOGGER.error(e.getStackTrace());
     		throw e;
     	}
     	return  this.convertToDto(customer);
@@ -124,7 +124,7 @@ public class CustomerService {
     }
 
     public void deleteCustomer(Integer customerId) throws CustomerNotFoundException {
-    	Customer customer = null;
+    	Customer customer ;
     	Optional<Customer> customerInRepo =  customerRepository.findById(customerId);
     	
     	if (customerInRepo.isPresent()) {
@@ -140,7 +140,7 @@ public class CustomerService {
     }
 
 	public CustomerDTO getCustomerWithIds( Integer customerId) throws CustomerNotFoundException {
-		Customer customer = null; 
+		Customer customer ;
 
 			 Optional<Customer> customerInRepo =  customerRepository.findById(customerId);
 			 if (customerInRepo.isPresent()) {
@@ -170,20 +170,6 @@ public class CustomerService {
 				.build();
 	}
 
-	/**************************************************************************************************************************************
-	 * @param customerDTO (Entity)
-	 * @return  CustomerDTO
-	 **************************************************************************************************************************************/
-
-	public Customer convertToEntity (CustomerDTO customerDTO) {
-
-		// converting into Entity
-		return Customer.builder()
-				.customerName(customerDTO.getCustomerName())
-				.email(customerDTO.getEmail())
-				.build();
-	}
-		
 }
 		
 	
