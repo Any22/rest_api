@@ -5,6 +5,7 @@ import org.springframework.validation.Errors;
 public class MethodArgumentNotValidException extends Exception  {
 	
 	private static final long serialVersionUID = 1L;
+
 	public MethodArgumentNotValidException() {		
 		super();		
 	} 

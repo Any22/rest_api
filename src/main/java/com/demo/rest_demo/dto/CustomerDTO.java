@@ -20,8 +20,7 @@ public class CustomerDTO {
 	
 	@NotNull (message="{customer.name.validation}")
 	private String customerName;
-	
-	
+
 	@Email (message ="{customer.email.validation}")
 	private String email;
 	

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.demo.rest_demo.exception.DuplicateDataFoundException;
+import jakarta.transaction.Transactional;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +45,7 @@ public class CustomerService {
 		// getting all entities from DB 
 		List<Customer> customer = customerRepository.findAll();
 
-		//creating a list of CustomerDTOs by converting entities into DTOs using "convertToDto" method
-
-		//List<CustomerDTO> customerDTOs = new ArrayList<>();
-
+		//Creating a list of CustomerDTOs by converting entities into DTOs using "convertToDto" method
 		return customer.stream()
 				.map(this::convertToDto)
 				.collect(Collectors.toList());
@@ -55,8 +54,7 @@ public class CustomerService {
 	
     public CustomerDTO getCustomerById(Integer customerId) throws CustomerNotFoundException {
 		
-		// getting the customer from DB 
-    	
+		// getting the customer from DB
 	    Optional<Customer> customerOptional = customerRepository.findById(customerId);
 	   
 	    if (customerOptional.isPresent()) {
@@ -72,23 +70,26 @@ public class CustomerService {
 	    }
 	}
 
-	/*************************************************************************************************************************
-	 * A helper method for Converting a customer DTO into customer entity to save into the repository
-	 **************************************************************************************************************************/
 
-	public void saveCustomer(CustomerDTO customerDTO) {
+	public CustomerDTO saveCustomer(CustomerDTO customerDTO) {
 
-		Customer customerEntity = new Customer();
+		// Checking  for duplication of data
+		Optional<Customer> duplicateEntity = customerRepository.findByEmail(customerDTO.getEmail());
+		if (duplicateEntity.isPresent()){
+			throw new DuplicateDataFoundException("The data already exists");
+		}
+		//Converting DTO to Entity
 
-		customerEntity.setCustomerName(customerDTO.getCustomerName());
-		customerEntity.setEmail(customerDTO.getEmail());
+		Customer customerEntity = this.convertToEntity(customerDTO);
 
-		customerRepository.saveAndFlush(customerEntity);
+		//saving the entity into repository
+		customerRepository.save(customerEntity);
 
+		//converting it back to DTO and returning it
+		return this.convertToDto(customerEntity);
 	}
 
     /**************************************************************************************************************************************
-     * 
      * @param customerId and customerDto
      * @return CustomerDTO
      **************************************************************************************************************************************/
@@ -107,7 +108,7 @@ public class CustomerService {
     		customer = customerInRepo.get();
     		customer.setEmail(customerDto.getEmail());
     		customer.setCustomerName(customerDto.getCustomerName());
-    		customerRepository.saveAndFlush(customer);
+    		customerRepository.save(customer);
     	
         } 	else {
         	
@@ -149,11 +150,15 @@ public class CustomerService {
 			    	 return  this.convertToDto(customer);
 			 }
 			    	 else {
-			 	    	LOGGER.info("the customerId doesnot exist");
+			 	    	LOGGER.info("the customerId does not exist");
 			 	    	throw new CustomerNotFoundException(idNotFound);
 			 	    
 			 	    }
 		  }
+
+	/*************************************************************************************************************************************
+	 * The helper methods for Converting a customer DTO into customer entity to save into the repository
+	 **************************************************************************************************************************************/
 
 	/**************************************************************************************************************************************
 	 * @param customer (Entity)
@@ -167,6 +172,15 @@ public class CustomerService {
 				.customerId(customer.getCustomerId())
 				.customerName(customer.getCustomerName())
 				.email(customer.getEmail())
+				.build();
+	}
+	public Customer convertToEntity(CustomerDTO customerDto) {
+
+		// converting into Entity
+		return Customer.builder()
+				.customerId(customerDto.getCustomerId())
+				.customerName(customerDto.getCustomerName())
+				.email(customerDto.getEmail())
 				.build();
 	}
 

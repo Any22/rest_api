@@ -71,3 +71,20 @@ Use Noun to represent the resources not verbs like /customer
   * we use annotations to validate input/incoming data
   * Bean validation API provides a number of annotations @Email, @Max ,@Min, @NotEmpty
   ******************************************************************************************************************************************/
+@PostMapping(value = "/create", consumes = {"application/json"})
+    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CustomerDTO customerDTO, Errors errors) throws MethodArgumentNotValidException {
+
+        String response = "";
+        if (errors.hasErrors()) {
+            response = errors.getAllErrors().stream().map(ObjectError::getDefaultMessage)
+                    .collect(Collectors.joining(","));
+            throw new MethodArgumentNotValidException(errors);
+
+        } else {
+            CustomerDTO savedCustomer =customerService.saveCustomer(customerDTO);
+            LOGGER.info(" Data for " + savedCustomer.getCustomerName() + " and saved !");
+            return new ResponseEntity<>(savedCustomer, HttpStatus.CREATED);
+        }
+
+
+    }

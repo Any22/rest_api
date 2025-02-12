@@ -11,18 +11,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CustomerServiceTest {
     private static final String CUSTOMER_NAME_TEST= "Test Name";
+    private static final String CUSTOMER_EMAIL_ADDRESS = "test_email@abc.com";
     @InjectMocks
     private CustomerService customerService;
 
@@ -32,7 +33,7 @@ public class CustomerServiceTest {
     @Test
     public void whenMapCustomerWithExactMatch_thenConvertsToDTO() {
 
-        Customer customer =  new Customer(100, CUSTOMER_NAME_TEST,"sophie@abcnetwork.com");
+        Customer customer =  new Customer(100, CUSTOMER_NAME_TEST,CUSTOMER_EMAIL_ADDRESS);
         CustomerDTO customerDTO = this.convertToDTO(customer);
 
         assertEquals(customer.getCustomerName(),customerDTO.getCustomerName());
@@ -73,14 +74,53 @@ public class CustomerServiceTest {
         });
     }
 
-    @Test
-    public void saveCustomer_validRequest_shouldCreateProduct(){
+//    @Test
+//    public void getCustomerById_success_returnMatchingDTO() {
+//        // Data Preparation
+//        Customer customer1 = mock(Customer.class);
+//        Optional<Customer> optionalCustomer = Optional.of(customer1);
+//
+//        // Mock behaviour
+//        when(customerRepository.findById(customer1.getCustomerId()).thenReturn(optionalCustomer));
+//
+//        // Actual service testing
+//        CustomerDTO customerDTO = customerService.getCustomerById();
+//
+//        assertAll("customerList", () -> {
+//            assertNotNull(customerList);
+//            assertAll("body",
+//                    () -> assertThat(customerService.getAllCustomer(), is(notNullValue())),
+//                    () -> assertThat(customerService.getAllCustomer().size(), is(2)),
+//                    () -> assertThat(customerService.getAllCustomer().getFirst().getCustomerId(), is(notNullValue()))
+//            );
+//
+//        });
+//    }
 
-        when(customerRepository.save(any())).thenReturn(CustomerDTO.builder().customerId(100).customerName("TestName").email("test_email@abc.com").build());
 
-}
+//    @Test
+//    public void saveCustomer_validRequest_shouldCreateProduct(){
+//        CustomerDTO customerDTO = CustomerDTO
+//                .builder()
+//                .customerId(100)
+//                .customerName(CUSTOMER_NAME_TEST)
+//                .email(CUSTOMER_EMAIL_ADDRESS)
+//                .build();
+//
+//        Customer customerEntity = Customer
+//                .builder()
+//                .customerId(customerDTO.getCustomerId())
+//                .customerName(customerDTO.getCustomerName())
+//                .email(customerDTO.getEmail())
+//                .build();
+//
+//
+//       // when(customerRepository.save(customerEntity)).thenReturn(customerDTO);
+//        }
 
-
-
+//
+//
+//
+    
 
 }
